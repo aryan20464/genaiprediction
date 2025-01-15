@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 
@@ -12,6 +13,23 @@ def train_model(train_file):
     # Split columns
     numcols = bikedf[['temp', 'atemp', 'hum', 'windspeed', 'casual', 'registered', 'cnt']]
     objcols = bikedf[['season', 'yr', 'mnth', 'hr', 'holiday', 'weekday', 'workingday', 'weathersit']]
+
+    # Check for multicollinearity
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(numcols.corr(), annot=True, cmap="plasma")
+    plt.title("Correlation Heatmap")
+    st.pyplot(plt)
+
+    # Distribution of "cnt"
+    fig, ax = plt.subplots(3, 1, figsize=(10, 12))
+    sns.histplot(numcols['cnt'], ax=ax[0])
+    ax[0].set_title("Histogram of 'cnt'")
+    sns.boxplot(numcols['cnt'], ax=ax[1], orient="h")
+    ax[1].set_title("Boxplot of 'cnt'")
+    sns.kdeplot(numcols['cnt'], ax=ax[2])
+    ax[2].set_title("KDE Plot of 'cnt'")
+    plt.tight_layout()
+    st.pyplot(fig)
 
     # Dummy encode categorical variables
     objcols_dummy = pd.get_dummies(objcols, columns=['season', 'yr', 'mnth', 'hr', 'holiday', 'weekday', 'workingday', 'weathersit'])
